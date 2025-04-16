@@ -12,6 +12,7 @@ public class ActorJugador extends Actor {
 
     public ActorJugador(Texture tjugador) {
         this.tjugador = tjugador;
+        this.alive = true;
         setSize(tjugador.getWidth(),tjugador.getHeight());
     }
 
@@ -23,5 +24,13 @@ public class ActorJugador extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.draw(tjugador,getX(),getY());
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
     }
 }

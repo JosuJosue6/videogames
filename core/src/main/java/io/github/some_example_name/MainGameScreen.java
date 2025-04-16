@@ -15,9 +15,9 @@ import io.github.some_example_name.actores.ActorObstacle;
 
 public class MainGameScreen extends BaseScreen{
     private Stage stage;
-    private Actor jugador;
+    private ActorJugador jugador;
     private Texture tjugador;
-    private Actor obstacle;
+    private ActorObstacle obstacle;
     private Texture tObstacle;
 
     public MainGameScreen(Main game) {
@@ -30,7 +30,7 @@ public class MainGameScreen extends BaseScreen{
     public void show() {
         stage= new Stage();
         stage.setDebugAll(true); //-- modo de depuracion
-        jugador= new ActorJugador(tjugador);
+        jugador = new ActorJugador(tjugador);
         obstacle = new ActorObstacle(tObstacle);
         stage.addActor(jugador);
         stage.addActor(obstacle);
@@ -60,9 +60,13 @@ public class MainGameScreen extends BaseScreen{
     }
 
     private void colition(){
-        if(jugador.getX()+jugador.getWidth() > obstacle.getX()){
-            System.out.println("Detected collition");
+        if(jugador.getX()+jugador.getWidth() > obstacle.getX() && jugador.isAlive()){
+            jugador.setAlive(false);
+            System.out.println("Muerto");
+            obstacle.setAlive(false);
         }
     }
+
+
 }
 
