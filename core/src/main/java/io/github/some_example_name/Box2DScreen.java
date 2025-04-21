@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 public class Box2DScreen extends BaseScreen {
 
@@ -26,6 +27,14 @@ public class Box2DScreen extends BaseScreen {
     private Body bodySuelo;
     private Fixture fixtureSuelo;
 
+    //-- Obstaculos
+    private Body bodyRock;
+    private Fixture fixtureRock;
+
+    //-- Colisiones
+    private Boolean playerAlive = true;
+
+
     public Box2DScreen(Main game) {
         super(game);
     }
@@ -35,13 +44,44 @@ public class Box2DScreen extends BaseScreen {
         //-- definir dos condiciones, gravedad
         world = new World(new Vector2(0, -10), true);
         renderer = new Box2DDebugRenderer();
-        camera = new OrthographicCamera(32, 18);
+        camera = new OrthographicCamera(7, 5);
+        camera.translate(0,-7);
+        world.setContactListener(new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                Fixture fixtureA, fixtureB;
+                fixtureA = contact.getFixtureA();
+                fixtureB = contact.getFixtureB();
+
+                if (fixtureA == fixturePlayer && fixtureB == fixtureRock){
+                    playerAlive = false;
+                }
+                if (fixtureB ==fixturePlayer && fixtureA == fixtureRock){
+                    playerAlive = false;
+                }
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {
+
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {
+
+            }
+        });
 
         //-- PLayer
         BodyDef playerDef = createBodyDef();
         bodyPlayer = world.createBody(playerDef);
         PolygonShape shapePlayer = new PolygonShape();
-        shapePlayer.setAsBox(1, 1);
+        shapePlayer.setAsBox(.5f, .5f);
         fixturePlayer = bodyPlayer.createFixture(shapePlayer, 1);
         shapePlayer.dispose();
 
@@ -49,41 +89,35 @@ public class Box2DScreen extends BaseScreen {
         BodyDef sueloDef = createBodyDef2();
         bodySuelo = world.createBody(sueloDef);
         PolygonShape shapeSuelo = new PolygonShape();
-        shapeSuelo.setAsBox(100, 10);
-        fixtureSuelo = bodySuelo.createFixture(shapeSuelo, 1);
+        shapeSuelo.setAsBox(100, 2);
+        fixtureSuelo = bodySuelo.createFixture(shapeSuelo, 0);
         shapeSuelo.dispose();
 
-        //-- Agregar el ContactListener para escuchar las colisiones
-        world.setContactListener(new ContactListener() {
-            @Override
-            public void beginContact(Contact contact) {
-                // Verificamos si el jugador está en contacto con el suelo
-                if (contact.getFixtureA() == fixturePlayer || contact.getFixtureB() == fixturePlayer) {
-                    // Detener el jugador, fijando su velocidad a 0
-                    bodyPlayer.setLinearVelocity(0, 0);
-                    bodyPlayer.setAngularVelocity(0); // Detener la rotación también si es necesario
-                }
-            }
+        //-- Roca
+        Vector2[] vertices = new Vector2[3];
+        vertices[0] = new Vector2(-.5f, -.5f);
+        vertices[1] = new Vector2(.5f, -.5f);
+        vertices[2] = new Vector2(0f, .5f);
 
-            @Override
-            public void endContact(Contact contact) {
-                // Aquí podrías agregar lógica adicional si necesitas algo cuando el contacto termine
-            }
+        for (int i = 0; i<10; i++) {
 
-            @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {
-                // Se puede usar para manejar las colisiones antes de que ocurran
+            float number = (float)Math.random()*25;
+            if (number > 5) {
+                BodyDef rocaDef = createObstacleDef(number);
+                bodyRock = world.createBody(rocaDef);
+                PolygonShape shapeRock = new PolygonShape();
+                shapeRock.set(vertices);
+                fixtureRock = bodyRock.createFixture(shapeRock, 0);
+                shapeRock.dispose();
             }
+        }
 
-            @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {
-                // Se puede usar para manejar cosas después de la resolución de la colisión
-            }
-        });
+
     }
 
     @Override
     public void dispose() {
+
         world.destroyBody(bodyPlayer);
         world.dispose();
         renderer.dispose();
@@ -94,15 +128,28 @@ public class Box2DScreen extends BaseScreen {
         Gdx.gl.glClearColor(1, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if(Gdx.input.justTouched()){
+            jump();
+        }
+        if (playerAlive) {
+            float velocity = bodyPlayer.getLinearVelocity().y;
+            bodyPlayer.setLinearVelocity(2.5f, velocity);
+        }
+
+        if (bodyPlayer.getPosition().x > 1 && playerAlive){
+            camera.translate(2.5f*delta,0,0);
+        }
+
         //-- método que sirve para simular los mundos
         world.step(delta, 6, 2);
         camera.update();
         renderer.render(world, camera.combined);
+        //jump();
     }
 
     private BodyDef createBodyDef() {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(0, 10); // Ajusta la posición del jugador
+        bodyDef.position.set(-4, -7.5f); // Ajusta la posición del jugador
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         return bodyDef;
     }
@@ -112,5 +159,16 @@ public class Box2DScreen extends BaseScreen {
         bodyDef.position.set(0, -10); // Ajusta la posición del suelo
         bodyDef.type = BodyDef.BodyType.StaticBody;
         return bodyDef;
+    }
+
+    private BodyDef createObstacleDef(float number) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(number, -7.5f);
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        return bodyDef;
+    }
+    private void jump (){
+        Vector2 position = bodyPlayer.getPosition();
+        bodyPlayer.applyLinearImpulse(0,5.5f,position.x, position.y, true );
     }
 }
