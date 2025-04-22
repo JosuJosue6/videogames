@@ -31,5 +31,6 @@ public class PlayerEntity extends Actor {
         shapePlayer.setAsBox(.5f, .5f);
         fixture = body.createFixture(shapePlayer, 1);
         shapePlayer.dispose();
+        //--  test
     }
 }
