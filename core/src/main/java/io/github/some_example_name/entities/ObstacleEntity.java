@@ -1,6 +1,5 @@
 package io.github.some_example_name.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -13,22 +12,23 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import io.github.some_example_name.Constants;
 
-public class PlayerEntity extends Actor {
+public class ObstacleEntity extends Actor {
 
     private Texture texture;
     private World world;
     private Fixture fixture;
     private Body body;
-    private boolean alive =true;
 
 
-    public PlayerEntity(World world, Texture texture, Vector2 position) {
+
+
+    public ObstacleEntity(World world, Texture texture, Vector2 position) {
         this.world = world;
         this.texture = texture;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(position);
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.type = BodyDef.BodyType.StaticBody;
 
         body = world.createBody(bodyDef);
 
@@ -47,29 +47,11 @@ public class PlayerEntity extends Actor {
         batch.draw(texture, getX(),getY(),getWidth(),getHeight());
     }
 
-
     @Override
     public void act(float delta) {
-        if(Gdx.input.justTouched()){
-            jump();
-        }
-        if(alive) {
-            float velocity = body.getLinearVelocity().y;
-            body.setLinearVelocity(2.5f, velocity);
-        }
+        //super.act(delta);
 
-    }
+            setX(getX() - 250 * delta);
 
-    private void jump (){
-        Vector2 position = body.getPosition();
-        body.applyLinearImpulse(0,5.5f,position.x, position.y, true );
-    }
-
-    public Body getBody() {
-        return body;
-    }
-
-    public boolean isAlive() {
-        return alive;
     }
 }

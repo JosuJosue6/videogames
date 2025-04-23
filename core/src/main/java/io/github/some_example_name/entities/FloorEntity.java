@@ -20,12 +20,12 @@ public class FloorEntity extends Actor {
     private Body body;
 
 
-    public FloorEntity(World world, Texture texture, float x, float y, float height, float width) {
+    public FloorEntity(World world, Texture texture, float x, float y, float width) {
         this.world = world;
         this.texture = texture;
 
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(x+width/2, y-.5f);
+        bodyDef.position.set((x+width)/2, y-.5f);
         bodyDef.type = BodyDef.BodyType.StaticBody;
 
         body = world.createBody(bodyDef);
@@ -36,12 +36,12 @@ public class FloorEntity extends Actor {
         shapePlayer.dispose();
 
         setSize(width*Constants.FCONVERTION, Constants.FCONVERTION);
-        setPosition((x-width/2)*Constants.FCONVERTION,(y-1)*Constants.FCONVERTION);
+        setPosition(((x-width)/2)*Constants.FCONVERTION,(y-1)*Constants.FCONVERTION);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        setPosition(body.getPosition().x*Constants.FCONVERTION,body.getPosition().y*Constants.FCONVERTION);
+        //setPosition(body.getPosition().x*Constants.FCONVERTION,body.getPosition().y*Constants.FCONVERTION);
         batch.draw(texture, getX(),getY(),getWidth(),getHeight());
     }
 }
