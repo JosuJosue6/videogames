@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import io.github.some_example_name.Constants;
 
-public class PlayerEntity extends Actor {
+public class FloorEntity extends Actor {
 
     private Texture texture;
     private World world;
@@ -20,23 +20,23 @@ public class PlayerEntity extends Actor {
     private Body body;
 
 
-    public PlayerEntity(World world, Texture texture, Vector2 position) {
+    public FloorEntity(World world, Texture texture, float x, float y, float height, float width) {
         this.world = world;
         this.texture = texture;
 
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(position);
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(x+width/2, y-.5f);
+        bodyDef.type = BodyDef.BodyType.StaticBody;
 
         body = world.createBody(bodyDef);
 
         PolygonShape shapePlayer = new PolygonShape();
-        shapePlayer.setAsBox(.5f, .5f);
+        shapePlayer.setAsBox(width/2, .5f);
         fixture = body.createFixture(shapePlayer, 1);
         shapePlayer.dispose();
 
-        setSize(Constants.FCONVERTION, Constants.FCONVERTION);
-        //--  test
+        setSize(width*Constants.FCONVERTION, Constants.FCONVERTION);
+        setPosition((x-width/2)*Constants.FCONVERTION,(y-1)*Constants.FCONVERTION);
     }
 
     @Override
