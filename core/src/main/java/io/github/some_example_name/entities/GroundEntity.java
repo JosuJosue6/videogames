@@ -1,23 +1,22 @@
 package io.github.some_example_name.entities;
 
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+
+
 import static io.github.some_example_name.Constants.FCONVERTION;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class ObstacleEntity extends Actor {
-
+public class GroundEntity extends Actor {
     private Texture texture;
     private Body body;
 
-    public ObstacleEntity(Texture texture, World world, Vector2 position, float width, float height) {
+    public GroundEntity(Texture texture, World world, Vector2 position, float width, float height) {
         this.texture = texture;
 
         // Crear cuerpo estático
@@ -35,6 +34,7 @@ public class ObstacleEntity extends Actor {
         // Tamaño gráfico (escala)
         setSize(width * FCONVERTION, height * FCONVERTION);
     }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         Vector2 pos = body.getPosition();
